@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/img_search_area"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/candidateContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/btn_showMore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="更多"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1.0">
+
+        <com.googlecode.openwnn.legacy.handwritingboard.HandWritingBoardLayout
+            android:id="@+id/handwrtingboard"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/iv_cancel"
+            android:layout_width="60px"
+            android:layout_height="60px"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="32px"
+            android:layout_marginBottom="36px"
+            android:background="@drawable/icon_cancel" />
+    </FrameLayout>
+
+</LinearLayout>

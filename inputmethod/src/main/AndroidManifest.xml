@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.softwaretest">
+
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true">
+        <service
+            android:id="@+id/openwnn_chinese"
+            android:name="com.googlecode.openwnn.legacy.OpenWnnZHCN"
+            android:label="中"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/method_zhcn" />
+        </service>
+
+    </application>
+
+</manifest>
