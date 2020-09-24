@@ -3,6 +3,7 @@ package com.example.softwaretest;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import com.example.softwaretest.adapter.ResultAdapter;
 import com.googlecode.openwnn.legacy.OnHandWritingRecognize;
 import com.googlecode.openwnn.legacy.WnnWord;
 import com.googlecode.openwnn.legacy.CLOUDSONG.CandidateView;
@@ -20,66 +21,67 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-public class MySoftWare extends RelativeLayout
-    implements OnCandidateSelected, OnHandWritingRecognize, OnPinyinQuery, OnClickListener
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+public class MySoftWare extends RelativeLayout implements OnHandWritingRecognize, OnPinyinQuery
 {
-    private Context context;
-    
-    private HandWritingBoardLayout handWritingBoard;
-    
-    private RelativeLayout candidateContainer;
-    
-    private CandidateView mCandidateView;
+    private HandWritingBoardLayout mHandWritingBoardLayout;
     
     private WeakReference<CurrentInputListener> mListener;
+    
+    private ResultAdapter mResultAdapter;
     
     public MySoftWare(Context context, AttributeSet attrs)
     {
         super(context, attrs);
-        this.context = context;
-        initView_Method();
-    }
-    
-    public void initView_Method()
-    {
         LayoutInflater.from(context).inflate(R.layout.input_view, this);
-        findViewById();
+        RecyclerView rcvResult = (RecyclerView)findViewById(R.id.rcv_result);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
+        rcvResult.setLayoutManager(linearLayoutManager);
+        mResultAdapter = new ResultAdapter();
+        rcvResult.setAdapter(mResultAdapter);
+        mHandWritingBoardLayout = (HandWritingBoardLayout)findViewById(R.id.handwrtingboard);
+        ImageView mIvCancel = (ImageView)findViewById(R.id.iv_cancel);
+        mIvCancel.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                mResultAdapter.clearResultView();
+                resetHandWritingRecognize();
+            }
+        });
+        
+        mResultAdapter.setOnResultListener(new ResultAdapter.OnResultListener()
+        {
+            @Override
+            public void onResult(WnnWord candidate)
+            {
+                String temp = null;
+                if (candidate != null)
+                {
+                    temp = candidate.candidate;
+                }
+                if (!TextUtils.isEmpty(temp))
+                {
+                    mListener.get().currentInputChange(temp);
+                }
+                mResultAdapter.clearResultView();
+                resetHandWritingRecognize();
+            }
+        });
         CloudKeyboardInputManager ckManager = new CloudKeyboardInputManager();
         ckManager.setOnPinyinQuery(this);
-        mCandidateView = new CandidateView(context);
-        mCandidateView.setOnCandidateSelected(this);
-        LayoutParams lp1 = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp1.addRule(RelativeLayout.LEFT_OF, R.id.btn_showMore);
-        lp1.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        candidateContainer.addView(mCandidateView, lp1);
         System.currentTimeMillis();
-        handWritingBoard.setVisibility(View.VISIBLE);
+        mHandWritingBoardLayout.setVisibility(View.VISIBLE);
         ckManager.delAll();
-        mCandidateView.clear();
-        handWritingBoard.setOnHandWritingRecognize(this);
-    }
-    
-    @Override
-    public void onClick(View view)
-    {
-    }
-    
-    @Override
-    public void candidateSelected(WnnWord wnnWord)
-    {
-        String candidate = null;
-        if (wnnWord != null)
-        {
-            candidate = wnnWord.candidate;
-        }
-        if (!TextUtils.isEmpty(candidate))
-        {
-            mListener.get().currentInputChange(candidate);
-        }
-        mCandidateView.clear();
-        resetHandWritingRecognize();
+        mResultAdapter.clearResultView();
+        mHandWritingBoardLayout.setOnHandWritingRecognize(this);
     }
     
     public void setCurrentInputListener(CurrentInputListener inputListener)
@@ -90,13 +92,13 @@ public class MySoftWare extends RelativeLayout
     @Override
     public void handWritingRecognized(ArrayList<WnnWord> result)
     {
-        mCandidateView.setSuggestions(result, false, false);
+        mResultAdapter.onBindData(result);
     }
     
     // TODO 整理一下
     private void resetHandWritingRecognize()
     {
-        handWritingBoard.reset_recognize();
+        mHandWritingBoardLayout.reset_recognize();
     }
     
     @Override
@@ -104,30 +106,8 @@ public class MySoftWare extends RelativeLayout
     {
         if (pyQueryResult != null)
         {
-            mCandidateView.setSuggestions(pyQueryResult.getCandidateList(), false, false);
-            String pinyin = pyQueryResult.getCurrentInput();
-            updatePinyin(pinyin);
+            mResultAdapter.onBindData(pyQueryResult.getCandidateList());
         }
     }
     
-    private void updatePinyin(String pinyin)
-    {
-        // System.out.println("====" + pinyin);
-    }
-    
-    private void findViewById()
-    {
-        candidateContainer = (RelativeLayout)findViewById(R.id.candidateContainer);
-        handWritingBoard = (HandWritingBoardLayout)findViewById(R.id.handwrtingboard);
-        ImageView mIvCancel = (ImageView)findViewById(R.id.iv_cancel);
-        mIvCancel.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                mCandidateView.clear();
-                resetHandWritingRecognize();
-            }
-        });
-    }
 }

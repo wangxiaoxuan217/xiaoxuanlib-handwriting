@@ -6,19 +6,10 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/candidateContainer"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_result"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Button
-            android:id="@+id/btn_showMore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="更多"
-            android:visibility="gone" />
-    </RelativeLayout>
+        android:layout_height="80px" />
 
     <FrameLayout
         android:layout_width="match_parent"

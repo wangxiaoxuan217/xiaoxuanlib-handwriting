@@ -7,9 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.appcompat.widget.AppCompatButton;
-
-public class CandidateViewButton extends AppCompatButton
+public class CandidateViewButton extends androidx.appcompat.widget.AppCompatButton
 {
     private int[] mUpState;
     

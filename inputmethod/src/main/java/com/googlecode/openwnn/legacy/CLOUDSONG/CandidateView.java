@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -23,7 +24,7 @@ public class CandidateView extends View
     
     private static final int SCROLL_PIXELS = 20;
     
-    private static final int X_GAP = 10;
+    private static final int X_GAP = 40;
     
     private static final List<WnnWord> EMPTY_LIST = new ArrayList<WnnWord>();
     
@@ -56,10 +57,21 @@ public class CandidateView extends View
     private int mTotalWidth;
     
     private OnCandidateSelected mOnCandidateSelected;
-
+    
+    public CandidateView(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+        init(context);
+    }
+    
     public CandidateView(Context context)
     {
         super(context);
+        init(context);
+    }
+    
+    private void init(Context context)
+    {
         mSelectionHighlight = context.getResources().getDrawable(android.R.drawable.list_selector_background);
         mSelectionHighlight.setState(new int[] {android.R.attr.state_enabled, android.R.attr.state_focused,
             android.R.attr.state_window_focused, android.R.attr.state_pressed});
@@ -200,12 +212,13 @@ public class CandidateView extends View
         invalidate();
     }
     
-    public void setSuggestions(List<WnnWord> suggestions, boolean completions, boolean typedWordValid)
+    public void setSuggestions(WnnWord suggestion, boolean completions, boolean typedWordValid)
     {
         clear();
-        if (suggestions != null)
+        if (suggestion != null)
         {
-            mSuggestions = new ArrayList<WnnWord>(suggestions);
+            mSuggestions = new ArrayList<WnnWord>();
+            mSuggestions.add(suggestion);
         }
         mTypedWordValid = typedWordValid;
         scrollTo(0, 0);
