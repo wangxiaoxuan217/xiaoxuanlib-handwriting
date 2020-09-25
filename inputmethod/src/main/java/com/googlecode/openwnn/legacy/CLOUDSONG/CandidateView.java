@@ -24,7 +24,7 @@ public class CandidateView extends View
     
     private static final int SCROLL_PIXELS = 20;
     
-    private static final int X_GAP = 40;
+    private static final int X_GAP = 20;
     
     private static final List<WnnWord> EMPTY_LIST = new ArrayList<WnnWord>();
     
@@ -76,7 +76,6 @@ public class CandidateView extends View
         mSelectionHighlight.setState(new int[] {android.R.attr.state_enabled, android.R.attr.state_focused,
             android.R.attr.state_window_focused, android.R.attr.state_pressed});
         Resources r = context.getResources();
-        setBackgroundColor(r.getColor(R.color.candidateContainer_bg));
         mColorNormal = r.getColor(R.color.white);
         mColorRecommended = r.getColor(R.color.white);
         mColorOther = r.getColor(R.color.white);
@@ -175,7 +174,7 @@ public class CandidateView extends View
                 }
                 canvas.drawText(suggestion, x + X_GAP, y, paint);
                 paint.setColor(mColorOther);
-//                canvas.drawLine(x + wordWidth + 0.5f, bgPadding.top, x + wordWidth + 0.5f, height + 1, paint);
+                // canvas.drawLine(x + wordWidth + 0.5f, bgPadding.top, x + wordWidth + 0.5f, height + 1, paint);
                 paint.setFakeBoldText(false);
             }
             x += wordWidth;

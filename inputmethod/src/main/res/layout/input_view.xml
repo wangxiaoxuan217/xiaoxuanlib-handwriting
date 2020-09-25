@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_hand_write_input"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/img_search_area"
+    android:background="@color/no_color"
     android:gravity="center"
     android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_result"
         android:layout_width="match_parent"
-        android:layout_height="80px" />
+        android:layout_height="80px"
+        android:background="@color/candidateContainer_bg" />
 
     <FrameLayout
         android:layout_width="match_parent"
