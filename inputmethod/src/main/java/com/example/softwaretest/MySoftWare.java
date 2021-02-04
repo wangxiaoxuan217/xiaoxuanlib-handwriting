@@ -52,8 +52,15 @@ public class MySoftWare extends RelativeLayout implements OnHandWritingRecognize
             @Override
             public void onClick(View view)
             {
-                mResultAdapter.clearResultView();
-                resetHandWritingRecognize();
+				if(mHandWritingBoardLayout.getCount()>0)
+				{
+					mResultAdapter.clearResultView();
+					resetHandWritingRecognize();
+				}
+				else
+				{
+					mListener.get().deleteInput();
+				}
             }
         });
         

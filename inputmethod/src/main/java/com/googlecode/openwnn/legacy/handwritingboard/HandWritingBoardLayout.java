@@ -184,6 +184,11 @@ public class HandWritingBoardLayout extends AbsoluteLayout
         }
         invalidate();
     }
+	
+	public int getCount()
+	{
+		return mCount;
+	}
     
     @Override
     public boolean onTouchEvent(MotionEvent event)
