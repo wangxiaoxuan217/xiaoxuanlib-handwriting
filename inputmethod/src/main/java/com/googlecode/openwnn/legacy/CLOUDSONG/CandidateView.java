@@ -16,69 +16,65 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class CandidateView extends View
-{
+public class CandidateView extends View {
     private static final int OUT_OF_BOUNDS = -1;
-    
+
     private static final int MAX_SUGGESTIONS = 32;
-    
+
     private static final int SCROLL_PIXELS = 20;
-    
+
     private static final int X_GAP = 20;
-    
+
     private static final List<WnnWord> EMPTY_LIST = new ArrayList<WnnWord>();
-    
+
     private List<WnnWord> mSuggestions;
-    
+
     private int mSelectedIndex;
-    
+
     private int mTouchX = OUT_OF_BOUNDS;
-    
+
     private Drawable mSelectionHighlight;
-    
+
     private boolean mTypedWordValid;
-    
+
     private Rect mBgPadding;
-    
+
     private int mColorNormal;
-    
+
     private int mColorRecommended;
-    
+
     private int mColorOther;
-    
+
     private int mVerticalPadding;
-    
+
     private Paint mPaint;
-    
+
     private boolean mScrolled;
-    
+
     private int mTargetScrollX;
-    
+
     private int mTotalWidth;
-    
+
     private OnCandidateSelected mOnCandidateSelected;
-    
-    public CandidateView(Context context, AttributeSet attrs)
-    {
+
+    public CandidateView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
-    
-    public CandidateView(Context context)
-    {
+
+    public CandidateView(Context context) {
         super(context);
         init(context);
     }
-    
-    private void init(Context context)
-    {
+
+    private void init(Context context) {
         mSelectionHighlight = context.getResources().getDrawable(android.R.drawable.list_selector_background);
-        mSelectionHighlight.setState(new int[] {android.R.attr.state_enabled, android.R.attr.state_focused,
-            android.R.attr.state_window_focused, android.R.attr.state_pressed});
+        mSelectionHighlight.setState(new int[]{android.R.attr.state_enabled, android.R.attr.state_focused,
+                android.R.attr.state_window_focused, android.R.attr.state_pressed});
         Resources r = context.getResources();
-        mColorNormal = r.getColor(R.color.white);
+        mColorNormal = r.getColor(R.color.white_65);
         mColorRecommended = r.getColor(R.color.white);
-        mColorOther = r.getColor(R.color.white);
+        mColorOther = r.getColor(R.color.white_65);
         mVerticalPadding = r.getDimensionPixelSize(R.dimen.activity_vertical_margin);
         mPaint = new Paint();
         mPaint.setColor(mColorNormal);
@@ -90,47 +86,41 @@ public class CandidateView extends View
         setHorizontalScrollBarEnabled(false);
         setVerticalScrollBarEnabled(false);
     }
-    
+
     @Override
-    public int computeHorizontalScrollRange()
-    {
+    public int computeHorizontalScrollRange() {
         return mTotalWidth;
     }
-    
+
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int measuredWidth = resolveSize(50, widthMeasureSpec);
-        
+
         // Get the desired height of the icon menu view (last row of items does
         // not have a divider below)
         Rect padding = new Rect();
         mSelectionHighlight.getPadding(padding);
-        final int desiredHeight = ((int)mPaint.getTextSize()) + mVerticalPadding + padding.top + padding.bottom;
-        
+        final int desiredHeight = ((int) mPaint.getTextSize()) + mVerticalPadding + padding.top + padding.bottom;
+
         // Maximum possible width and desired height
         setMeasuredDimension(measuredWidth, resolveSize(desiredHeight, heightMeasureSpec));
     }
-    
+
     /**
      * If the canvas is null, then only touch calculations are performed to pick the target candidate.
      */
     @Override
-    protected void onDraw(Canvas canvas)
-    {
-        if (canvas != null)
-        {
+    protected void onDraw(Canvas canvas) {
+        if (canvas != null) {
             super.onDraw(canvas);
         }
         mTotalWidth = 0;
         if (mSuggestions == null)
             return;
-        
-        if (mBgPadding == null)
-        {
+
+        if (mBgPadding == null) {
             mBgPadding = new Rect(0, 0, 0, 0);
-            if (getBackground() != null)
-            {
+            if (getBackground() != null) {
                 getBackground().getPadding(mBgPadding);
             }
         }
@@ -143,17 +133,14 @@ public class CandidateView extends View
         final int scrollX = getScrollX();
         final boolean scrolled = mScrolled;
         final boolean typedWordValid = mTypedWordValid;
-        final int y = (int)(((height - mPaint.getTextSize()) / 2) - mPaint.ascent());
-        for (int i = 0; i < count; i++)
-        {
+        final int y = (int) (((height - mPaint.getTextSize()) / 2) - mPaint.ascent());
+        for (int i = 0; i < count; i++) {
             String suggestion = mSuggestions.get(i).candidate;
             float textWidth = paint.measureText(suggestion);
-            final int wordWidth = (int)textWidth + X_GAP * 2;
+            final int wordWidth = (int) textWidth + X_GAP * 2;
             paint.setColor(mColorNormal);
-            if (touchX + scrollX >= x && touchX + scrollX < x + wordWidth && !scrolled)
-            {
-                if (canvas != null)
-                {
+            if (touchX + scrollX >= x && touchX + scrollX < x + wordWidth && !scrolled) {
+                if (canvas != null) {
                     canvas.translate(x, 0);
                     mSelectionHighlight.setBounds(0, bgPadding.top, wordWidth, height);
                     mSelectionHighlight.draw(canvas);
@@ -161,15 +148,11 @@ public class CandidateView extends View
                 }
                 mSelectedIndex = i;
             }
-            if (canvas != null)
-            {
-                if ((i == 1 && !typedWordValid) || (i == 0 && typedWordValid))
-                {
+            if (canvas != null) {
+                if ((i == 1 && !typedWordValid) || (i == 0 && typedWordValid)) {
                     paint.setFakeBoldText(true);
                     paint.setColor(mColorRecommended);
-                }
-                else if (i != 0)
-                {
+                } else if (i != 0) {
                     paint.setColor(mColorOther);
                 }
                 canvas.drawText(suggestion, x + X_GAP, y, paint);
@@ -180,29 +163,22 @@ public class CandidateView extends View
             x += wordWidth;
         }
         mTotalWidth = x;
-        if (mTargetScrollX != getScrollX())
-        {
+        if (mTargetScrollX != getScrollX()) {
             scrollToTarget();
         }
     }
-    
-    private void scrollToTarget()
-    {
+
+    private void scrollToTarget() {
         int sx = getScrollX();
-        if (mTargetScrollX > sx)
-        {
+        if (mTargetScrollX > sx) {
             sx += SCROLL_PIXELS;
-            if (sx >= mTargetScrollX)
-            {
+            if (sx >= mTargetScrollX) {
                 sx = mTargetScrollX;
                 requestLayout();
             }
-        }
-        else
-        {
+        } else {
             sx -= SCROLL_PIXELS;
-            if (sx <= mTargetScrollX)
-            {
+            if (sx <= mTargetScrollX) {
                 sx = mTargetScrollX;
                 requestLayout();
             }
@@ -210,12 +186,10 @@ public class CandidateView extends View
         scrollTo(sx, getScrollY());
         invalidate();
     }
-    
-    public void setSuggestions(WnnWord suggestion, boolean completions, boolean typedWordValid)
-    {
+
+    public void setSuggestions(WnnWord suggestion, boolean completions, boolean typedWordValid) {
         clear();
-        if (suggestion != null)
-        {
+        if (suggestion != null) {
             mSuggestions = new ArrayList<WnnWord>();
             mSuggestions.add(suggestion);
         }
@@ -226,34 +200,29 @@ public class CandidateView extends View
         invalidate();
         requestLayout();
     }
-    
-    public void clear()
-    {
+
+    public void clear() {
         mSuggestions = EMPTY_LIST;
         mTouchX = OUT_OF_BOUNDS;
         mSelectedIndex = -1;
         invalidate();
     }
-    
+
     @Override
-    public boolean onTouchEvent(MotionEvent me)
-    {
+    public boolean onTouchEvent(MotionEvent me) {
         int action = me.getAction();
-        int x = (int)me.getX();
-        int y = (int)me.getY();
+        int x = (int) me.getX();
+        int y = (int) me.getY();
         mTouchX = x;
-        switch (action)
-        {
+        switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mScrolled = false;
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (y <= 0)
-                {
+                if (y <= 0) {
                     // Fling up!?
-                    if (mSelectedIndex >= 0)
-                    {
+                    if (mSelectedIndex >= 0) {
                         // TODO 选择关键字上屏
                         mSelectedIndex = -1;
                     }
@@ -261,10 +230,8 @@ public class CandidateView extends View
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                if (!mScrolled)
-                {
-                    if (mSelectedIndex >= 0)
-                    {
+                if (!mScrolled) {
+                    if (mSelectedIndex >= 0) {
                         // TODO 选择关键字上屏
                         mOnCandidateSelected.candidateSelected(mSuggestions.get(mSelectedIndex));
                     }
@@ -276,15 +243,13 @@ public class CandidateView extends View
         }
         return true;
     }
-    
-    private void removeHighlight()
-    {
+
+    private void removeHighlight() {
         mTouchX = OUT_OF_BOUNDS;
         invalidate();
     }
-    
-    public void setOnCandidateSelected(OnCandidateSelected candidateSelected)
-    {
+
+    public void setOnCandidateSelected(OnCandidateSelected candidateSelected) {
         this.mOnCandidateSelected = candidateSelected;
     }
 }

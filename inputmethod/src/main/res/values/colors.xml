@@ -17,6 +17,8 @@
     <color name="candidate_text">#ff404040</color>
     <color name="candidate_back">#FFEFEBEF</color>
     <color name="white">#ffffff</color>
+    <color name="white_65">#A6ffffff</color>
+    <color name="paint_line">#00ffff</color>
     <color name="no_color">#00ffffff</color>
     <color name="candidateContainer_bg">#36131314</color>
 </resources>

@@ -3,10 +3,12 @@ package com.googlecode.openwnn.legacy.handwritingboard;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import com.example.softwaretest.R;
 import com.googlecode.openwnn.legacy.OnHandWritingRecognize;
 import com.googlecode.openwnn.legacy.WnnWord;
 import com.wwengine.hw.WWHandWrite;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
@@ -16,167 +18,145 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.AbsoluteLayout;
 
-public class HandWritingBoardLayout extends AbsoluteLayout
-{
+public class HandWritingBoardLayout extends AbsoluteLayout {
     private static final float TOUCH_TOLERANCE = 4;
-    
-    private static char[] mResult1;
-    
-    private static short[] mTracks;
-    
-    private static int mCount;
-    
-    private static Context mContext;
-    
-    private OnHandWritingRecognize mOnHandWritingRecognize;
-    
-    private Path mPath;
-    
-    private Paint mPaint;
-    
-    private float mX, mY;
-    
 
-    public HandWritingBoardLayout(Context context)
-    {
+    private static char[] mResult1;
+
+    private static short[] mTracks;
+
+    private static int mCount;
+
+    private static Context mContext;
+
+    private OnHandWritingRecognize mOnHandWritingRecognize;
+
+    private Path mPath;
+
+    private Paint mPaint;
+
+    private float mX, mY;
+
+
+    public HandWritingBoardLayout(Context context) {
         super(context);
         init();
     }
-    
 
-    public HandWritingBoardLayout(Context context, AttributeSet attrs)
-    {
+
+    public HandWritingBoardLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
         init();
         hw_init();
     }
-    
-    private static byte[] readData(AssetManager am, String name)
-    {
-        try
-        {
-            
+
+    private static byte[] readData(AssetManager am, String name) {
+        try {
+
             InputStream is = am.open(name);
-            if (is == null)
-            {
+            if (is == null) {
                 return null;
             }
-            
+
             int length = is.available();
-            if (length <= 0)
-            {
+            if (length <= 0) {
                 return null;
             }
-            
+
             byte[] buf = new byte[length];
-            if (buf == null)
-            {
+            if (buf == null) {
                 return null;
             }
-            
-            if (is.read(buf, 0, length) == -1)
-            {
+
+            if (is.read(buf, 0, length) == -1) {
                 return null;
             }
             is.close();
             return buf;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return null;
         }
     }
-    
-    private void hw_init()
-    {
+
+    private void hw_init() {
         byte[] hwData = readData(mContext.getAssets(), "hwdata.bin");
-        if (hwData == null)
-        {
+        if (hwData == null) {
             return;
         }
         WWHandWrite.apkBinding(mContext);
-        if (WWHandWrite.hwInit(hwData, 0) != 0)
-        {
+        if (WWHandWrite.hwInit(hwData, 0) != 0) {
             return;
         }
         mResult1 = new char[256];
         mTracks = new short[1024];
         mCount = 0;
     }
-    
-    private void init()
-    {
+
+    @SuppressLint("ResourceAsColor")
+    private void init() {
         // why only set background then invalidate() valid
         this.setBackgroundColor(android.R.color.holo_blue_bright);
         mPath = new Path();
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(0xFFFF0000);
+        mPaint.setColor(R.color.paint_line);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(6);
         Paint paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintText.setColor(0xFFFF0000);
+        paintText.setColor(R.color.paint_line);
         paintText.setTextAlign(Paint.Align.LEFT);
     }
-    
+
     @Override
-    protected void onDraw(Canvas canvas)
-    {
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawPath(mPath, mPaint);
     }
-    
-    private void touch_start(float x, float y)
-    {
+
+    private void touch_start(float x, float y) {
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
-        mTracks[mCount++] = (short)x;
-        mTracks[mCount++] = (short)y;
+        mTracks[mCount++] = (short) x;
+        mTracks[mCount++] = (short) y;
     }
-    
-    private void touch_move(float x, float y)
-    {
+
+    private void touch_move(float x, float y) {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE)
-        {
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
             mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             mX = x;
             mY = y;
         }
-        mTracks[mCount++] = (short)x;
-        mTracks[mCount++] = (short)y;
+        mTracks[mCount++] = (short) x;
+        mTracks[mCount++] = (short) y;
     }
-    
-    private void touch_up()
-    {
+
+    private void touch_up() {
         mPath.lineTo(mX, mY);
         mTracks[mCount++] = -1;
         mTracks[mCount++] = 0;
         recognize();
     }
-    
-    private void recognize()
-    {
+
+    private void recognize() {
         short[] mTracksTemp;
         int countTemp = mCount;
         mTracksTemp = mTracks.clone();
         mTracksTemp[countTemp++] = -1;
         mTracksTemp[countTemp++] = -1;
         WWHandWrite.hwRecognize(mTracksTemp, mResult1, 10, 0xFFFF);
-        if (mOnHandWritingRecognize != null)
-        {
+        if (mOnHandWritingRecognize != null) {
             mOnHandWritingRecognize.handWritingRecognized(convertCharToWnnWord(mResult1));
         }
     }
-    
-    public void reset_recognize()
-    {
+
+    public void reset_recognize() {
         mCount = 0;
         mResult1 = new char[256];
         {
@@ -184,19 +164,16 @@ public class HandWritingBoardLayout extends AbsoluteLayout
         }
         invalidate();
     }
-	
-	public int getCount()
-	{
-		return mCount;
-	}
-    
+
+    public int getCount() {
+        return mCount;
+    }
+
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
+    public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-        switch (event.getAction())
-        {
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 touch_start(x, y);
                 invalidate();
@@ -212,18 +189,15 @@ public class HandWritingBoardLayout extends AbsoluteLayout
         }
         return true;
     }
-    
-    public void setOnHandWritingRecognize(OnHandWritingRecognize handWritingRecognize)
-    {
+
+    public void setOnHandWritingRecognize(OnHandWritingRecognize handWritingRecognize) {
         this.mOnHandWritingRecognize = handWritingRecognize;
     }
-    
-    private ArrayList<WnnWord> convertCharToWnnWord(char[] result)
-    {
+
+    private ArrayList<WnnWord> convertCharToWnnWord(char[] result) {
         ArrayList<WnnWord> words = new ArrayList<WnnWord>();
         int length = result.length;
-        for (int i = 0; i < length; ++i)
-        {
+        for (int i = 0; i < length; ++i) {
             WnnWord wnnWord = new WnnWord(String.valueOf(result[i]), "");
             words.add(wnnWord);
         }
