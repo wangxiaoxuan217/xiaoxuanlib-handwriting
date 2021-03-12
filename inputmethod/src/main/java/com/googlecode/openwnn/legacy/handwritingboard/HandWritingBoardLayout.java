@@ -1,22 +1,22 @@
 package com.googlecode.openwnn.legacy.handwritingboard;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-
-import com.example.softwaretest.R;
-import com.googlecode.openwnn.legacy.OnHandWritingRecognize;
-import com.googlecode.openwnn.legacy.WnnWord;
-import com.wwengine.hw.WWHandWrite;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.AbsoluteLayout;
+
+import com.googlecode.openwnn.legacy.OnHandWritingRecognize;
+import com.googlecode.openwnn.legacy.WnnWord;
+import com.wwengine.hw.WWHandWrite;
+
+import java.io.InputStream;
+import java.util.ArrayList;
 
 public class HandWritingBoardLayout extends AbsoluteLayout {
     private static final float TOUCH_TOLERANCE = 4;
@@ -37,10 +37,19 @@ public class HandWritingBoardLayout extends AbsoluteLayout {
 
     private float mX, mY;
 
-
+    public HandWritingBoardLayout(Context context, AttributeSet attrs, int defStyle)
+    {
+        super(context, attrs, defStyle);
+        // TODO Auto-generated constructor stub
+        mContext = context;
+        init();
+        hw_init();
+    }
     public HandWritingBoardLayout(Context context) {
         super(context);
+        mContext = context;
         init();
+        hw_init();
     }
 
 
@@ -96,18 +105,19 @@ public class HandWritingBoardLayout extends AbsoluteLayout {
     @SuppressLint("ResourceAsColor")
     private void init() {
         // why only set background then invalidate() valid
-        this.setBackgroundColor(android.R.color.holo_blue_bright);
+        this.setBackgroundColor(android.R.color.white);
+        int color=Color.rgb(0, 255, 255);
         mPath = new Path();
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(R.color.paint_line);
+        mPaint.setColor(color);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(6);
         Paint paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintText.setColor(R.color.paint_line);
+        paintText.setColor(color);
         paintText.setTextAlign(Paint.Align.LEFT);
     }
 
